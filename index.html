@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>videojs.ima</title>
+  <link rel="stylesheet" href="./node_modules/video.js/dist/video-js.css">
+  <link rel="stylesheet" href="./node_modules/videojs-contrib-ads/dist/videojs.ads.css">
+  <link rel="stylesheet" href="./node_modules/videojs-ima/dist/videojs.ima.css">
+</head>
+
+<body>
+  <video id="content_video" class="video-js vjs-default-skin" controls preload="auto" width="640" height="360">
+    <source src="https://storage.googleapis.com/gvabox/media/samples/android.mp4" type="video/mp4" />
+  </video>
+
+  <script src="http://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+  <script src="./node_modules/video.js/dist/video.js"></script>
+  <script src="./node_modules/videojs-contrib-ads/dist/videojs.ads.js"></script>
+  <script src="./node_modules/videojs-ima/dist/videojs.ima.js"></script>
+
+  <script>
+    var player = videojs('content_video');
+
+    var options = {
+      id: 'content_video',
+      adTagUrl: 'http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=xml_vmap1&unviewed_position_start=1&cust_params=sample_ar%3Dpremidpostpod%26deployment%3Dgmf-js&cmsid=496&vid=short_onecue&correlator=',
+    };
+
+    player.ima(options);
+
+    player.on('ads-manager', function (response) {
+      console.dir(response);
+    });
+  </script>
+</body>
+
+</html>

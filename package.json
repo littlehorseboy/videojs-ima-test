@@ -1,0 +1,17 @@
+{
+  "name": "videojs-ima-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "video.js": "^7.6.6",
+    "videojs-contrib-ads": "^6.6.5",
+    "videojs-ima": "^1.7.2"
+  }
+}
