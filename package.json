@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "can-autoplay": "^3.0.0",
     "video.js": "^7.6.6",
     "videojs-contrib-ads": "^6.6.5",
     "videojs-ima": "^1.7.2"

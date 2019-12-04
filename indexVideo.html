@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>videojs.ima</title>
+  <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+  <link rel="stylesheet" href="./lib/video.js-v7.6.6/dist/video-js.css">
+  <link rel="stylesheet" href="./lib/videojs-contrib-ads-v6.6.5/dist/videojs.ads.css">
+  <link rel="stylesheet" href="./lib/videojs-ima-v1.7.2/dist/videojs.ima.css">
+  <style>
+    @media only screen and (max-width: 767px) {
+      #my-player {
+        height: 40vh !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header id="header">header</header>
+
+  <div>header 分隔線</div>
+
+  <div id="my-player-mobile-content">
+
+  </div>
+
+  <div id="my-player-content">
+    <video id="my-player" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" width="640"
+      height="360" playsinline style="width: 100%;">
+      <source src="https://storage.googleapis.com/gvabox/media/samples/android.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <div style="height: 800px;"></div>
+
+  <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+  <script src="./lib/video.js-v7.6.6/dist/video.js"></script>
+  <script src="./lib/videojs-contrib-ads-v6.6.5/dist/videojs.ads.js"></script>
+  <script src="./lib/videojs-ima-v1.7.2/dist/videojs.ima.js"></script>
+  <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+
+  <script>
+    // 判斷是否為手機
+    function isMobile() {
+      var mobile_flag = false;
+      var mobileAgents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPad', 'iPod'];
+
+      // 根據 userAgent 判斷是否是手機
+      mobile_flag = mobileAgents.some(str => navigator.userAgent.includes(str));
+
+      // 根據屏幕分辨率判斷是否是手機
+      if (window.screen.width < 500 && window.screen.height < 800) {
+        mobile_flag = true;
+      }
+
+      return mobile_flag;
+    }
+
+    $('#header').after($('#my-player-mobile-content'));
+
+    let checkMobile = false;
+    let startingMove = false;
+
+    function checkOrientation() { // 判斷手機是否橫向
+      let mode = Math.abs(window.orientation) == 90 ? 'landscape' : 'portrait';
+      let mobile_flag = isMobile(); // true 爲 PC 端，false 爲手機端
+
+      if (mode == 'landscape' && mobile_flag && checkMobile) { // 橫向時
+        if ($('#my-player-mobile-content > .video-js').length > 0) {
+          $('#my-player-content').prepend($('#my-player-mobile-content > .video-js'));
+          $('#my-player-mobile-content').hide();
+        }
+
+        if (!startingMove) {
+          var top = ($('#my-player').offset().top - $('#header').height()); // -52
+          $('body, html').animate({
+            scrollTop: top,
+          }, 1000);
+          startingMove = true;
+        }
+      } else if (mode == 'portrait' && mobile_flag && checkMobile) { // 豎向時
+        if ($('#my-player-content > .video-js').length > 0) {
+          $('#my-player-mobile-content').append($('#my-player-content > .video-js'));
+          $('#my-player-mobile-content').show();
+        }
+      } else if (mobile_flag && !checkMobile) {
+        $('#my-player-mobile-content').append($('#my-player-content > .video-js'));
+        $('#my-player-mobile-content').show();
+        checkMobile = true;
+      } else if (!mobile_flag && !startingMove) {
+        var top = ($('#my-player').offset().top - $('#header').height()); // -52
+        $('body, html').animate({
+          scrollTop: top
+        }, 1000);
+        startingMove = true;
+      }
+    };
+    // window.addEventListener("resize", checkOrientation, false);
+    // window.addEventListener("orientationchange", checkOrientation, false);
+    setInterval(checkOrientation, 500);
+    // -----------
+
+    setTimeout(() => {
+      var player = videojs('my-player', {
+				controls: true,
+				autoplay: false,
+				preload: 'none',
+				width: window.innerWidth
+          || document.documentElement.clientWidth
+          || document.body.clientWidth,
+			});
+
+      var isADready = 0;
+
+      var options = {
+        id: 'my-player',
+        // adTagUrl: 'http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=xml_vmap1&unviewed_position_start=1&cust_params=sample_ar%3Dpremidpostpod%26deployment%3Dgmf-js&cmsid=496&vid=short_onecue&correlator=',
+        adTagUrl: 'https://googleads.g.doubleclick.net/pagead/ads?ad_type=video&client=ca-video-pub-6515642348270358&description_url=https%3A%2F%2Fifunmy.cc%2F&videoad_start_delay=0&hl=zh_TW&max_ad_duration=30000&sdmax=30000&adtest=on',
+        vpaidMode: google.ima.ImaSdkSettings.VpaidMode.INSECURE,
+      };
+
+      player.ima(options);
+
+      player.on("ready", function() {
+        console.log("initializeAdDisplayContainer");
+        player.ima.initializeAdDisplayContainer();
+        isADready = 1;
+      });
+
+      player.on("adsready", () => {
+        [
+          google.ima.AdEvent.Type.ALL_ADS_COMPLETED,
+          google.ima.AdEvent.Type.CLICK,
+          google.ima.AdEvent.Type.COMPLETE,
+          google.ima.AdEvent.Type.FIRST_QUARTILE,
+          google.ima.AdEvent.Type.LOADED,
+          google.ima.AdEvent.Type.MIDPOINT,
+          google.ima.AdEvent.Type.PAUSED,
+          google.ima.AdEvent.Type.RESUMED,
+          google.ima.AdEvent.Type.STARTED,
+          google.ima.AdEvent.Type.THIRD_QUARTILE,
+        ].forEach(eventType => {
+          player.ima.addEventListener(
+            eventType,
+            (event) => {
+              console.log(event.type);
+              if (event.type === 'complete') {
+                var adsmanager = player.ima.getAdsManager();
+                player.ima.changeAdTag("");
+              }
+            },
+          );
+        });
+
+        isADready = true;
+
+        setTimeout(() => {
+          player.play();
+        }, 0);
+      });
+
+      player.on('ads-manager', function (response) {
+        console.dir(response);
+      });
+    }, 1000);
+  </script>
+</body>
+
+</html>
